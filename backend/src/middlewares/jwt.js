@@ -5,7 +5,7 @@ export function jwtSign(req, res, next){
     try {
         const {username} = req.body;
         if(!username) throw new AppError('Username is required', 400);
-        const token = jwt.sign({username}, process.env.JWT_SECRET, {algorithm: 'RS256', expiresIn: '1h'});
+        const token = jwt.sign({username}, process.env.JWT_SECRET, { expiresIn: '1h'});
         if(!token) return res.status(500).json({status: 'error', message: 'Failed to sign JWT'});
         req.token = token;
         next();
@@ -17,8 +17,9 @@ export function jwtSign(req, res, next){
 
 export function jwtVerify(token){
     try {
-        return jwt.verify(token, process.env.JWT_SECRET, {algorithms : 'RS256'}, (err, decoded) => {
+        return jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
             if(err) throw new AppError('Invalid token: ' + err.message, 401);
+            return decoded;
         })
     } catch (error) {
         throw new AppError('Error verifying JWT: ' + error.message, 401);
@@ -28,7 +29,7 @@ export function jwtVerify(token){
 
 export function authenticateUser(req, res, next){
     try {
-        const authHeader = req.headers.authorization;
+        const authHeader = req.headers['authorization'];
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
             throw new AppError('Authorization header is missing or invalid', 401);
         }

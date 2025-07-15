@@ -4,7 +4,7 @@ import { authenticateUser, jwtSign } from '../middlewares/jwt.js';
 
 const router = express.Router();
 
-router.get('/user/login', authenticateUser, userLogin);
+router.get('/user/login', jwtSign, userLogin);
 router.post('/user/signup',jwtSign, userSignup);
 
 export default router;
