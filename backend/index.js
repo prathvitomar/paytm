@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import {dbConnection, dbDisconnect} from './src/utils/dbConfig.js';
 import AppError from './src/utils/error.js';
 import globalErrorHandler from './src/middlewares/globalErrorHandler.js';
+import userRouter from './src/routes/user.route.js';
 
 const app = express();
 
@@ -15,8 +16,13 @@ app.get("/", (req, res)=>{
     res.send("Welcome to the Paytm Backend");
 })
 
+app.use("/api/v1/", userRouter)
+
 app.all("*", (req, res) => {
-    next(new AppError("This route does not exist", 404));
+    return res.status(404).json({
+        status: "fail",
+        message: `Route does not exist`,
+    });
 })
 
 app.use(globalErrorHandler);
