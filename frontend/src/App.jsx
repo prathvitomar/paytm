@@ -1,10 +1,11 @@
+import Navbar from "./components/ui/Navbar"
 
 function App() {
 
   return (
-    <div>
-        Hello world
-    </div>
+    <>
+      <Navbar/>
+    </>
   )
 }
 
