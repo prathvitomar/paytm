@@ -7,6 +7,7 @@ import Signin from './components/pages/signin/Signin.page.jsx'
 import Signup from './components/pages/signup/Signup.page.jsx'
 import Dashboard from './components/pages/dashboard/Dashboard.page.jsx'
 import Send from './components/pages/send/Send.page.jsx'
+import PaymentHistory from './components/pages/payment-history/paymentHistory.page.jsx'
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
   {
     path : '/send',
     element: <Send />,
+  },
+  {
+    path : '/history',
+    element: <PaymentHistory />,
   },
 ])
 
