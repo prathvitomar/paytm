@@ -11,6 +11,10 @@ import PaymentHistory from './components/pages/payment-history/paymentHistory.pa
 
 const router = createBrowserRouter([
   {
+    path : '/',
+    element: <App />,
+  },
+  {
     path : '/signin',
     element: <Signin />,
   },

@@ -94,8 +94,8 @@ export async function userSignup(req, res) {
       balance: Math.floor(Math.random() * 1000) + 1,
     });
 
-    if (!userData)
-      return res.status(500).json({
+    if (!userData && !accountBalance)
+      return res.status(401).json({
         status: "error",
         message: "Failed to create user",
       });

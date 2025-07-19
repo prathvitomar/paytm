@@ -1,8 +1,11 @@
+import dotenv from 'dotenv';
+dotenv.config()
 import jwt from 'jsonwebtoken';
 import AppError from '../utils/error.js';
 
 export function jwtSign(req, res, next){
     try {
+        console.log(req.body)
         const {username} = req.body;
         if(!username) throw new AppError('Username is required', 400);
         const token = jwt.sign({username}, process.env.JWT_SECRET, { expiresIn: '1h'});
