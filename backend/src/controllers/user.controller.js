@@ -15,7 +15,6 @@ const loginObj = z.object({
   password: z.string().min(6).max(20),
 });
 
-
 export async function userLogin(req, res) {
   try {
     const parsed = loginObj.safeParse(req.body);
@@ -58,8 +57,6 @@ export async function userLogin(req, res) {
     });
   }
 }
-
-
 
 export async function userSignup(req, res) {
   try {
@@ -119,5 +116,33 @@ export async function userSignup(req, res) {
   }
 }
 
-
-
+export async function userLoginCheck(req, res) {
+  try {
+    if (req.user) {
+      console.log(req.user.username);
+      const userDetails = await User.findOne({ username: req.user.username });
+      console.log(userDetails);
+      if (!userDetails) {
+        return res.status(404).json({
+          status: "fail",
+          message: "User not found",
+        });
+      }
+      const userObj = userDetails.toObject();
+      delete userObj.password;
+      delete userObj.__v;
+      return res.status(200).json({
+        status: "success",
+        message: "Token is still accessible and hasnt expired yet",
+        data: {
+          user: userObj,
+        },
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Failed to check user login status",
+    });
+  }
+}

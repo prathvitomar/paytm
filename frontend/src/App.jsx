@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
-import Navbar from "./components/ui/Navbar"
+import Navbar from "./components/ui/Navbar";
+import Loader from "./components/ui/Loader";
 
 function App() {
   return (
     <>
-      <Navbar/>
+      <Navbar />
+       <Loader/>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
