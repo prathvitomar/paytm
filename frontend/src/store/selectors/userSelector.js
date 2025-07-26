@@ -17,9 +17,9 @@ export const userSelector = selector({
 
     const res = await response.json();
     
-    // API returns: { status, message, data: { user: { ... } } }
     if (!res?.data?.user) throw new Error("Invalid response format");
 
-    return res.data.user; // return only user object
+    return res.data.user;
   },
 });
+

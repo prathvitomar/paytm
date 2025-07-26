@@ -10,6 +10,7 @@ import Dashboard from "./components/pages/dashboard/Dashboard.page.jsx";
 import Send from "./components/pages/send/Send.page.jsx";
 import PaymentHistory from "./components/pages/payment-history/paymentHistory.page.jsx";
 import AuthGuard from "./components/utils/AuthGuard.jsx";
+import AuthProvider from "./components/utils/AuthProvider.jsx";
 
 const router = createBrowserRouter([
   {
@@ -57,9 +58,10 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <RecoilRoot>
-      <RouterProvider router={router}>
-        <App />
-      </RouterProvider>
+        <AuthProvider>
+        <RouterProvider router={router}/>
+          {/* <App /> */}
+        </AuthProvider>
     </RecoilRoot>
   </React.StrictMode>
 );
