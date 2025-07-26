@@ -1,11 +1,33 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useLogin } from "../../../store/hooks/useLogin";
+import { useRecoilValue } from "recoil";
+import { authState } from "../../../store/atoms/authAtom";
 
 function Signin() {
+  const login = useLogin();
+  const navigate = useNavigate()
+  const authValues = useRecoilValue(authState)
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
+
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    const result = await login(formData);
+    console.log(result);
+
+    if (result.success) {
+      console.log("Login Successful");
+      navigate("/dashboard", { replace: true });
+    } else {
+      console.error("Login Failed:", result.error);
+    }
+  }
+
 
   return (
     <>
@@ -39,7 +61,7 @@ function Signin() {
               </div>
             </div>
 
-            <form className="flex flex-col pt-3 md:pt-8">
+            <form onSubmit={handleSubmit} className="flex flex-col pt-3 md:pt-8" >
               <div className="flex flex-col pt-4">
                 <div className="focus-within:border-b-gray-500 relative flex overflow-hidden border-b-2 transition">
                   <input

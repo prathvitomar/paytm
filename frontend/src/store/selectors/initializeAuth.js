@@ -1,4 +1,5 @@
 import { selector } from "recoil";
+import { authState } from "../atoms/authAtom";
 
 export const initializeAuth = selector({
   key: "initializeAuth",
@@ -13,7 +14,7 @@ export const initializeAuth = selector({
     }
 
     try {
-        const res = await fetch("api/v1/me", {
+        const res = await fetch("/api/v1/user/me", {
             headers : {
                 "Content-Type": "application/json",
                 "Authorization" : `Bearer ${localStorage.getItem("token")}`
@@ -21,10 +22,12 @@ export const initializeAuth = selector({
         });
         if (!res.ok) throw new Error("Invalid token");
         const data = await res.json();
-        return {
+        if(data.status === "success"){
+          return {
             isAuthenticated : true,
-            user : user.data.data,
+            user : data.data.user,
             loading: false
+          }
         }
 
     } catch (error) {

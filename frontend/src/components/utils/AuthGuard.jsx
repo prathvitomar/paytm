@@ -6,32 +6,13 @@ import Loader from "../ui/Loader.jsx";
 import {authState} from "../../store/atoms/authAtom.js"
 
 function AuthGuard({ children }) {
-  // const navigate = useNavigate();
-  // const userData = useRecoilValueLoadable(userSelector);
-
-  // useEffect(() => {
-  //   if (userData.state === "hasError") {
-  //     localStorage.removeItem("token");
-  //     navigate("/signin", { replace: true });
-  //   }
-  // }, [userData.state, navigate]);
-
-  // if (userData.state === "loading") {
-  //   return <Loader />;
-  // }
-
-  // if (userData.state === "hasValue") {
-  //   return <>{children}</>;
-  // }
-
-  // return null; 
-
   const auth = useRecoilValue(authState);
+  console.log(auth)
   const navigate = useNavigate();
 
   useEffect(()=>{
     if(!auth.loading && !auth.isAuthenticated) navigate("/signin", {replace : true});
-  },[auth.state, auth.isAuthenticated, navigate])
+  },[auth.loading, auth.isAuthenticated, navigate])
 
   if(auth.loading) return <Loader/>
 

@@ -60,7 +60,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <RecoilRoot>
         <AuthProvider>
         <RouterProvider router={router}/>
-          {/* <App /> */}
         </AuthProvider>
     </RecoilRoot>
   </React.StrictMode>
