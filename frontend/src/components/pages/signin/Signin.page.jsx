@@ -3,34 +3,76 @@ import { Link, useNavigate } from "react-router-dom";
 import { useLogin } from "../../../store/hooks/useLogin";
 import { useRecoilValue } from "recoil";
 import { authState } from "../../../store/atoms/authAtom";
+import * as z from "zod";
+import Alert from "../../ui/Alert";
 
 function Signin() {
   const login = useLogin();
-  const navigate = useNavigate()
-  const authValues = useRecoilValue(authState)
+  const navigate = useNavigate();
+  const authValues = useRecoilValue(authState);
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
+  const [alert, setAlert] = useState(null);
 
+  const loginObj = z.object({
+    username: z.string().min(3).max(15),
+    password: z.string().min(6).max(20),
+  });
 
   async function handleSubmit(e) {
     e.preventDefault();
+    const parsed = loginObj.safeParse(formData);
+    if (!parsed.success) {
+      setAlert({
+        type: "error",
+        title: "Invalid Data",
+        message: "Please Check and Refill the details",
+      });
+      setTimeout(() => {
+        setAlert(null);
+        setFormData({ username: "", password: "" });
+      }, 5000);
+    } else if (parsed.success) {
+      const result = await login(formData);
+      console.log(result);
 
-    const result = await login(formData);
-    console.log(result);
-
-    if (result.success) {
-      console.log("Login Successful");
-      navigate("/dashboard", { replace: true });
-    } else {
-      console.error("Login Failed:", result.error);
+      if (result.success) {
+        setAlert({
+          type: "success",
+          title: "Logged In",
+          message: "You are Logged In SuccessFully",
+        });
+        setTimeout(() => {
+          setAlert(null);
+          setFormData({ username: "", password: "" });
+          console.log("Login Successful");
+          navigate("/dashboard", { replace: true });
+        }, 5000);
+      } else {
+        setAlert({
+          type: "error",
+          title: "Login Failed",
+          message: "Incorrect Credentials.",
+        });
+        setTimeout(() => {
+          setAlert(null);
+          setFormData({ username: "", password: "" });
+          console.error("Login Failed:", result.error);
+        }, 5000);
+      }
     }
   }
 
-
   return (
     <>
+      {alert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <Alert {...alert} />
+        </div>
+      )}
+
       <div className="flex flex-wrap">
         <div className="flex w-full flex-col md:w-1/2">
           <div className="lg:w-[28rem] mx-auto my-auto flex flex-col justify-center pt-8 md:justify-start md:px-6 md:pt-0">
@@ -61,7 +103,10 @@ function Signin() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col pt-3 md:pt-8" >
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col pt-3 md:pt-8"
+            >
               <div className="flex flex-col pt-4">
                 <div className="focus-within:border-b-gray-500 relative flex overflow-hidden border-b-2 transition">
                   <input

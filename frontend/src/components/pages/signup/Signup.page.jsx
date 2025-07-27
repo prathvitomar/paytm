@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import Button from "../../ui/Button";
-import Input from "../../ui/Input";
-import Label from "../../ui/Label";
-import SigninBanner from "../banners/SigninBanner";
+import { Link, useNavigate } from "react-router-dom";
+import * as z from "zod";
+import { useSignup } from "../../../store/hooks/useSignup";
+import Alert from "../../ui/Alert";
 
 function Signup() {
+  const [alert, setAlert] = useState(null);
+  const navigate = useNavigate();
+  const signup = useSignup();
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -14,13 +16,117 @@ function Signup() {
     termAndConditions: false,
   });
 
-  function handleSubmit(e) {
+  const signupObj = z.object({
+    firstName: z.string().min(3).max(15),
+    lastName: z.string().min(3).max(15),
+    username: z.string().min(3).max(15),
+    password: z.string().min(6).max(20),
+    termAndConditions: z.literal(true),
+  });
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    console.log("Form submitted", formData);
+    console.log("FormData : ", formData);
+    if (!formData.termAndConditions) {
+      setAlert({
+        type: "warning",
+        title: "Accept Terms and Conditions",
+        message: "Please Accept Terms and Conditions to Create Account",
+      });
+      setTimeout(() => {
+        setAlert(null);
+        setFormData(
+          {
+            username: "",
+            password: "",
+            firstName: "",
+            lastName: "",
+            termAndConditions: false,
+          },
+          5000
+        );
+      }, 5000);
+    }
+    const parsedData = signupObj.safeParse(formData);
+    if (!parsedData.success) {
+      setAlert({
+        type: "error",
+        title: "Invalid Details",
+        message: "Please Check the Details Again",
+      });
+
+      setTimeout(() => {
+        setAlert(null);
+        setFormData(
+          {
+            username: "",
+            password: "",
+            firstName: "",
+            lastName: "",
+            termAndConditions: false,
+          },
+          5000
+        );
+      }, 5000);
+    } else if (parsedData.success) {
+      const signupData = await signup({
+        username: formData.username,
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+      });
+      if (signupData.success) {
+        setAlert({
+          type: "success",
+          title: "Signed Up",
+          message: "Your Account Created SuccessFully",
+        });
+        setTimeout(() => {
+          setAlert(null);
+          setFormData(
+            {
+              username: "",
+              password: "",
+              firstName: "",
+              lastName: "",
+              termAndConditions: false,
+            },
+            5000
+          );
+          console.log("Signup Successful");
+          navigate("/dashboard", { replace: true });
+        }, 5000);
+      } else {
+        setAlert({
+          type: "error",
+          title: "Signup Failed",
+          message: "Incorrect Credentials. Please Fill Data Again",
+        });
+        setTimeout(() => {
+          setAlert(null);
+          setFormData(
+            {
+              username: "",
+              password: "",
+              firstName: "",
+              lastName: "",
+              termAndConditions: false,
+            },
+            5000
+          );
+          console.error("Signup Failed:", signupData.error);
+        }, 5000);
+      }
+    }
   }
 
   return (
     <>
+      {alert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <Alert {...alert} />
+        </div>
+      )}
       <div className="flex w-screen flex-wrap text-slate-800">
         <div className="relative hidden h-screen select-none flex flex-col bg-blue-300 text-center md:flex md:w-1/2">
           <img
@@ -70,7 +176,10 @@ function Signup() {
               </div>
             </div>
 
-            <form className="flex flex-col items-stretch mt-2" onSubmit={handleSubmit}>
+            <form
+              className="flex flex-col items-stretch mt-2"
+              onSubmit={handleSubmit}
+            >
               {/* Name */}
               <div className="flex flex-col pt-2">
                 <div className="relative flex overflow-hidden rounded-md border-2 transition focus-within:border-blue-600">
