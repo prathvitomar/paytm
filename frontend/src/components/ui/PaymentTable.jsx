@@ -37,11 +37,11 @@ function PaymentTable({ columnName, columnData, className }) {
                     </span>
                   </td>
                   <td className="px-4 py-3 font-medium">₹{txn.amount}</td>
-                  <td className="px-4 py-3">{txn.date}</td>
+                  <td className="px-4 py-3">{txn.createdAt.split("T")[0]}</td>
                 </tr>
               ))
             ) : (
-              <div>
+              <div className="flex justify-center align-center">
                 <h1>You have No Transaction Yet.</h1>
               </div>
             )}

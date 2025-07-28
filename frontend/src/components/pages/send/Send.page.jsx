@@ -1,25 +1,100 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Alert from "../../ui/Alert";
+import { useLogin } from "../../../store/hooks/useLogin";
 
 function Send({ handleCancel, handleFunds }) {
-    const [alert, setAlert] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const [alert, setAlert] = useState(null);
+  const { getUsers } = useLogin();
   const paymentOptions = ["Bank Transfer", "PayPal", "Credit Card"];
   const [selectedPaymentOption, setSelectedPaymentOption] = useState(
     paymentOptions[0]
   );
-  const [transferData, setTransferData] = useState({ amount: 0, to: "" });
+  const [transferData, setTransferData] = useState({
+    name: "",
+    amount: 0,
+    to: "",
+  });
 
-  function handleTransferFunds(e){
+  async function handleTransferFunds(e) {
     e.preventDefault();
-    handleFunds(transferData);
-    
+    if (!transferData.amount > 0 || !transferData.to) {
+      setAlert({
+        type: "warning",
+        title: "Fill the Details Correctly",
+        message: `Invalid Details`,
+      });
+      setTimeout(() => {
+        setAlert(null);
+        setTransferData({ name: "", amount: 0, to: "" });
+      }, 3000);
+    } else {
+      const status = await handleFunds(transferData);
+      console.log("response from handleFunds", status);
+
+      if (status.success) {
+        setAlert({
+          type: "success",
+          title: "Transfer Successful",
+          message: `₹${transferData.amount} sent to ${transferData.name}`,
+        });
+        setTimeout(() => {
+          setAlert(null);
+          setTransferData({ name: "", amount: 0, to: "" });
+        }, 3000);
+      } else {
+        setAlert({
+          type: "error",
+          title: "Transfer Failed",
+          message:
+            status.message || "Something went wrong while sending money.",
+        });
+        setTimeout(() => {
+          setAlert(null);
+          setTransferData({ name: "", amount: 0, to: "" });
+        }, 3000);
+      }
+    }
   }
 
-  console.log(transferData)
+  const suggestionRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        suggestionRef.current &&
+        !suggestionRef.current.contains(event.target)
+      ) {
+        setShowSuggestions(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    async function fetchingData() {
+      try {
+        const res = await getUsers();
+        setUsers(res.users || []);
+        setFilteredUsers(res.users);
+        console.log(users);
+      } catch (error) {
+        throw Error("Error Occurred in Send Page");
+      }
+    }
+    fetchingData();
+  }, []);
 
   return (
     <>
-          {alert && (
+      {alert && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <Alert {...alert} />
         </div>
@@ -71,29 +146,61 @@ function Send({ handleCancel, handleFunds }) {
 
             {selectedPaymentOption === "Bank Transfer" ? (
               <form>
-                <div className="mb-4">
+                <div className="mb-4 relative" ref={suggestionRef}>
                   <label
                     className="block text-slate-300 text-sm mb-2"
                     htmlFor="sendMoney"
                   >
                     Send Money To :
                   </label>
+
                   <input
                     type="text"
                     id="to"
                     name="to"
                     className="px-4 py-2.5 bg-slate-800 border border-slate-600 text-slate-300 w-full text-sm rounded-md outline-0"
                     placeholder="Receiver's name"
-                    value={transferData.to}
-                    onChange={(e) =>
-                      setTransferData((prev) => ({
-                        ...prev,
-                        [e.target.name]: e.target.value,
-                      }))
-                    }
+                    value={transferData.name}
+                    onFocus={() => {
+                      if (users.length > 0) setShowSuggestions(true);
+                    }}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setTransferData((prev) => ({ ...prev, name: value }));
+
+                      const filtered = users.filter((user) =>
+                        user.username
+                          .toLowerCase()
+                          .includes(value.toLowerCase())
+                      );
+                      setFilteredUsers(filtered);
+                      setShowSuggestions(true);
+                    }}
                     required
                   />
+
+                  {showSuggestions && filteredUsers.length > 0 && (
+                    <ul className="absolute left-0 right-0 z-10 bg-slate-800 border border-slate-600 text-slate-300 rounded-md mt-1 max-h-40 overflow-y-auto shadow-lg">
+                      {filteredUsers.map((user) => (
+                        <li
+                          key={user._id}
+                          className="px-4 py-2 cursor-pointer hover:bg-slate-700"
+                          onClick={() => {
+                            setTransferData((prev) => ({
+                              ...prev,
+                              name: user.username,
+                              to: user._id,
+                            }));
+                            setShowSuggestions(false);
+                          }}
+                        >
+                          {user.username}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
+
                 <div className="mb-4">
                   <label
                     className="block text-slate-300 text-sm mb-2"
@@ -126,7 +233,8 @@ function Send({ handleCancel, handleFunds }) {
                     onClick={handleTransferFunds}
                     className="cursor-pointer w-full py-2.5 px-4 rounded-md flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-sm text-white font-medium transition-colors"
                   >
-                    Pay {transferData.amount>0 ? `₹${transferData.amount}`: null}
+                    Pay{" "}
+                    {transferData.amount > 0 ? `₹${transferData.amount}` : null}
                   </button>
                   <div className="flex items-center justify-center text-center text-slate-400 text-m">
                     <span>Secure payment powered by </span>

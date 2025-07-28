@@ -10,7 +10,7 @@ export function useLogin() {
 
     try {
       const res = await fetch("/api/v1/user/login", {
-        method: "POST", 
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -44,14 +44,35 @@ export function useLogin() {
   }
 
   function logout() {
-      localStorage.removeItem("token");
-      setAuth({
-        isAuthenticated: false,
-        user: null,
-        loading: false,
-      });
-      return { success: true };
+    localStorage.removeItem("token");
+    setAuth({
+      isAuthenticated: false,
+      user: null,
+      loading: false,
+    });
+    return { success: true };
   }
 
-  return {login, logout};
+  async function getUsers() {
+    try {
+      const res = await fetch("/api/v1/user/all", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.status === "success") {
+        return { success: true, users: data.data.users };
+      } else {
+        throw new Error(data.message || "Login failed");
+      }
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  return { login, logout, getUsers };
 }

@@ -121,7 +121,6 @@ export async function userLoginCheck(req, res) {
     if (req.user) {
       console.log(req.user.username);
       const userDetails = await User.findOne({ username: req.user.username });
-      console.log(userDetails);
       if (!userDetails) {
         return res.status(404).json({
           status: "fail",
@@ -143,6 +142,36 @@ export async function userLoginCheck(req, res) {
     return res.status(500).json({
       status: "error",
       message: "Failed to check user login status",
+    });
+  }
+}
+
+
+export async function getAllUsers(req, res) {
+  try {
+    const currentUsername = req.user.username;
+
+    const allUsers = await User.find({ username: { $ne: currentUsername } }).select(
+      "-password -__v -firstName -lastName"
+    );
+
+    if (!allUsers || allUsers.length === 0) {
+      return res.status(400).json({
+        status: "error",
+        message: "No Users Found",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      data: {
+        users: allUsers,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Failed to retrieve users",
     });
   }
 }

@@ -14,12 +14,17 @@ export function useAccount() {
       });
       const data = await response.json();
       if (response.ok && data.status === "success") {
-        setAccountDetails((prev) => ({...prev, currentBalance : data.data.balance}))
+        setAccountDetails((prev) => ({
+          ...prev,
+          currentBalance: data.data.balance,
+          totalMoneySent: data.data.totalSent,
+          totalMoneyReceived: data.data.totalReceived,
+        }));
         return { success: true };
-      }else {
+      } else {
         throw new Error(data.message || "Failed while Checking Balance");
       }
-    }  catch (error) {
+    } catch (error) {
       return { success: false, error: error.message };
     }
   }
@@ -27,22 +32,23 @@ export function useAccount() {
   async function transferFunds(transferDetails) {
     try {
       const response = await fetch("api/v1/account/transfer", {
-        method : "POST",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body : JSON.stringify(transferDetails)
+        body: JSON.stringify(transferDetails),
       });
       const data = await response.json();
       console.log(data);
-      if (response.ok && data.status === "success") {
-        checkBalance();
+      if (data.status === "success") {
+        await checkBalance();
+        await transferHistory();
         return { success: true };
-      }else {
+      } else {
         throw new Error(data.message || "Failed while Checking Balance");
       }
-    }  catch (error) {
+    } catch (error) {
       return { success: false, error: error.message };
     }
   }
@@ -58,15 +64,18 @@ export function useAccount() {
       const data = await response.json();
       console.log(data);
       if (response.ok && data.status === "success") {
-        setAccountDetails((prev) => ({...prev, transactionHistory : data.data.transactions}))
+        setAccountDetails((prev) => ({
+          ...prev,
+          transactionHistory: data.data.transactions,
+        }));
         return { success: true };
-      }else {
+      } else {
         throw new Error(data.message || "Failed while Checking Balance");
       }
-    }  catch (error) {
+    } catch (error) {
       return { success: false, error: error.message };
-    } 
+    }
   }
 
-  return {checkBalance, transferFunds, transferHistory};
+  return { checkBalance, transferFunds, transferHistory };
 }

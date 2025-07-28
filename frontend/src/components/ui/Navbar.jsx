@@ -1,25 +1,23 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLogin } from "../../store/hooks/useLogin";
 
-function Navbar({navOptions, selectedOption, handleSelectedOption}) {
+function Navbar({ navOptions, selectedOption, handleSelectedOption }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const {logout} = useLogin();
-
+  const { logout } = useLogin();
 
   useEffect(() => {
-  function handleClickOutside(event) {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setIsOpen(false);
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
     }
-  }
 
-  document.addEventListener("mousedown", handleClickOutside);
-  return () => {
-    document.removeEventListener("mousedown", handleClickOutside);
-  };
-}, []);
-
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <>
@@ -36,11 +34,6 @@ function Navbar({navOptions, selectedOption, handleSelectedOption}) {
               >
                 <span className="absolute -inset-0.5"></span>
                 <span className="sr-only">Open main menu</span>
-                {/* <!--
-            Icon when menu is closed.
-
-            Menu open: "hidden", Menu closed: "block"
-          --> */}
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -56,11 +49,6 @@ function Navbar({navOptions, selectedOption, handleSelectedOption}) {
                     strokeLinejoin="round"
                   />
                 </svg>
-                {/* <!--
-            Icon when menu is open.
-
-            Menu open: "block", Menu closed: "hidden"
-          --> */}
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -88,22 +76,25 @@ function Navbar({navOptions, selectedOption, handleSelectedOption}) {
               </div>
               <div className="hidden sm:ml-6 sm:block">
                 <div className="flex space-x-4">
-                  {
-                    navOptions.map((nav)=> (
+                  {navOptions.map((nav) => (
                     <a
-                    // href="#"
-                    key={nav.name}
-                    aria-current="page"
-                    className={`cursor-pointer rounded-md px-3 py-2 text-sm font-medium  ${selectedOption === nav.name ? "bg-blue-900 text-white hover:bg-gray-800" : "text-black hover:bg-gray-200"}`}
-                    onClick={()=> handleSelectedOption(nav.name)}
-                  >
-                    {nav.name}
-                  </a>
-                    ))
-                  }
+                      // href="#"
+                      key={nav.name}
+                      aria-current="page"
+                      className={`cursor-pointer rounded-md px-3 py-2 text-sm font-medium  ${
+                        selectedOption === nav.name
+                          ? "bg-blue-900 text-white hover:bg-gray-800"
+                          : "text-black hover:bg-gray-200"
+                      }`}
+                      onClick={() => handleSelectedOption(nav.name)}
+                    >
+                      {nav.name}
+                    </a>
+                  ))}
                 </div>
               </div>
             </div>
+
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
               <button
                 type="button"
@@ -128,7 +119,6 @@ function Navbar({navOptions, selectedOption, handleSelectedOption}) {
                 </svg>
               </button>
 
-              {/* <!-- Profile dropdown --> */}
               <div className="relative ml-3" ref={dropdownRef}>
                 <div>
                   <button
@@ -148,17 +138,6 @@ function Navbar({navOptions, selectedOption, handleSelectedOption}) {
                     />
                   </button>
                 </div>
-
-                {/* <!--
-            Dropdown menu, show/hide based on menu state.
-
-            Entering: "transition ease-out duration-100"
-              From: "transform opacity-0 scale-95"
-              To: "transform opacity-100 scale-100"
-            Leaving: "transition ease-in duration-75"
-              From: "transform opacity-100 scale-100"
-              To: "transform opacity-0 scale-95"
-          --> */}
                 {isOpen && (
                   <div
                     role="menu"
@@ -188,28 +167,34 @@ function Navbar({navOptions, selectedOption, handleSelectedOption}) {
                   </div>
                 )}
               </div>
+              <a
+                aria-current="page"
+                className={`cursor-pointer rounded-md m-2 px-3 py-2 text-sm font-medium bg-gray-900 text-white hover:bg-red-400`}
+                onClick={logout}
+              >
+                Logout
+              </a>
             </div>
           </div>
         </div>
 
-        {/* <!-- Mobile menu, show/hide based on menu state. --> */}
         <div id="mobile-menu" className="sm:hidden">
           <div className="space-y-1 px-2 pt-2 pb-3">
-            {/* <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" --> */}
 
-                  {
-                    navOptions.map((nav)=> (
-                    <a
-                    // href="#"
-                    key={nav.name}
-                    aria-current="page"
-                    className={`cursor-pointer block rounded-md px-3 py-2 text-base font-medium  ${selectedOption === nav.name ? "bg-blue-900 text-white hover:bg-gray-800" : "text-black hover:bg-gray-200"}`}
-                    onClick={()=> handleSelectedOption(nav.name)}
-                  >
-                    {nav.name}
-                  </a>
-                    ))
-                  }
+            {navOptions.map((nav) => (
+              <a
+                key={nav.name}
+                aria-current="page"
+                className={`cursor-pointer block rounded-md px-3 py-2 text-base font-medium  ${
+                  selectedOption === nav.name
+                    ? "bg-blue-900 text-white hover:bg-gray-800"
+                    : "text-black hover:bg-gray-200"
+                }`}
+                onClick={() => handleSelectedOption(nav.name)}
+              >
+                {nav.name}
+              </a>
+            ))}
           </div>
         </div>
       </nav>

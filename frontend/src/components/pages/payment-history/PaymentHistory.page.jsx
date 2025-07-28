@@ -27,26 +27,6 @@ function PaymentHistory() {
     "Amount",
     "Date",
   ];
-  const columnData = [
-    {
-      id: 1,
-      type: "Received",
-      name: "Ankit Sharma",
-      amount: 1200,
-      balanceBefore: 3000,
-      balanceAfter: 4200,
-      date: "2025-07-26",
-    },
-    {
-      id: 2,
-      type: "Sent",
-      name: "Paytm Recharge",
-      amount: 500,
-      balanceBefore: 4200,
-      balanceAfter: 3700,
-      date: "2025-07-25",
-    },
-  ];
 
   useEffect(() => {
     async function handleCheckBalance(){
@@ -57,11 +37,9 @@ function PaymentHistory() {
     handleCheckBalance()
   }, []);
 
-  function handleFunds(data) {
-    transferFunds(data);
+  async function handleFunds(data) {
+    return await transferFunds(data);
   }
-
-  console.log(accountValues);
 
   return (
     <>
@@ -78,7 +56,7 @@ function PaymentHistory() {
           />
         </div>
       )}
-      <div className="font-sans">
+      <div className="font-sans overflow-x-hidden">
         <div className="mx-auto max-w-screen-xl bg-white">
           <div className="flex justify-between">
             <h1 className="mt-5 mb-5 ml-5 text-2xl font-bold text-gray-900">
@@ -138,7 +116,7 @@ function PaymentHistory() {
                   <Loader/>
                 ) : (
                   <p className="text-3xl font-bold text-white-900">
-                    ₹{transactions.sent}
+                    ₹{accountValues.totalMoneySent}
                   </p>
                 )}
               </div>
@@ -151,7 +129,7 @@ function PaymentHistory() {
                   <Loader/>
                 ) : (
                   <p className="text-3xl font-bold text-green-900">
-                    ₹{transactions.received}
+                    ₹{accountValues.totalMoneyReceived}
                   </p>
                 )}
               </div>
@@ -183,7 +161,7 @@ function PaymentHistory() {
                     type="text"
                     name="search"
                     className="h-12 w-full border-b-gray-400 bg-transparent py-4 pl-12 text-sm outline-none focus:border-b-2"
-                    placeholder="Search by Order ID, Date, Customer"
+                    placeholder="Search Customer"
                   />
                 </form>
                 <button
