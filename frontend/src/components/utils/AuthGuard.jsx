@@ -14,7 +14,11 @@ function AuthGuard({ children }) {
     if(!auth.loading && !auth.isAuthenticated) navigate("/signin", {replace : true});
   },[auth.loading, auth.isAuthenticated, navigate])
 
-  if(auth.loading) return <Loader/>
+  if(auth.loading) return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <Loader/>
+      </div>
+  )
 
   if(auth.isAuthenticated) return <>{children}</>
 

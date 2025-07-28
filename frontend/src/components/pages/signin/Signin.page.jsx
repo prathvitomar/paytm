@@ -7,7 +7,7 @@ import * as z from "zod";
 import Alert from "../../ui/Alert";
 
 function Signin() {
-  const login = useLogin();
+  const {login} = useLogin();
   const navigate = useNavigate();
   const authValues = useRecoilValue(authState);
   const [formData, setFormData] = useState({

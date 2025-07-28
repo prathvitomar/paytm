@@ -1,7 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useLogin } from "../../store/hooks/useLogin";
 
-function Navbar() {
+function Navbar({navOptions, selectedOption, handleSelectedOption}) {
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const {logout} = useLogin();
+
+
+  useEffect(() => {
+  function handleClickOutside(event) {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsOpen(false);
+    }
+  }
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
+
+
   return (
     <>
       <nav className="bg-white-800 border-b border-gray-200">
@@ -69,32 +88,19 @@ function Navbar() {
               </div>
               <div className="hidden sm:ml-6 sm:block">
                 <div className="flex space-x-4">
-                  {/* <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" --> */}
-                  <a
-                    href="#"
+                  {
+                    navOptions.map((nav)=> (
+                    <a
+                    // href="#"
+                    key={nav.name}
                     aria-current="page"
-                    className="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white"
+                    className={`cursor-pointer rounded-md px-3 py-2 text-sm font-medium  ${selectedOption === nav.name ? "bg-blue-900 text-white hover:bg-gray-800" : "text-black hover:bg-gray-200"}`}
+                    onClick={()=> handleSelectedOption(nav.name)}
                   >
-                    Dashboard
+                    {nav.name}
                   </a>
-                  <a
-                    href="#"
-                    className="rounded-md px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-700 hover:text-white"
-                  >
-                    Team
-                  </a>
-                  <a
-                    href="#"
-                    className="rounded-md px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-700 hover:text-white"
-                  >
-                    Projects
-                  </a>
-                  <a
-                    href="#"
-                    className="rounded-md px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-700 hover:text-white"
-                  >
-                    Calendar
-                  </a>
+                    ))
+                  }
                 </div>
               </div>
             </div>
@@ -123,7 +129,7 @@ function Navbar() {
               </button>
 
               {/* <!-- Profile dropdown --> */}
-              <div className="relative ml-3">
+              <div className="relative ml-3" ref={dropdownRef}>
                 <div>
                   <button
                     onClick={() => setIsOpen(!isOpen)}
@@ -159,35 +165,25 @@ function Navbar() {
                     tabindex="-1"
                     aria-labelledby="user-menu-button"
                     aria-orientation="vertical"
-                    className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 focus:outline-hidden"
+                    className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white  py-1 shadow-lg ring-1 ring-black/5 focus:outline-hidden"
                   >
-                    {/* <!-- Active: "bg-gray-100 outline-hidden", Not Active: "" --> */}
                     <a
                       id="user-menu-item-0"
                       role="menuitem"
-                      href="#"
                       tabindex="-1"
-                      className="block px-4 py-2 text-sm text-gray-700"
+                      className="cursor-pointer hover:bg-gray-200 block px-4 py-2 text-sm text-gray-700"
                     >
                       Your Profile
                     </a>
                     <a
-                      id="user-menu-item-1"
-                      role="menuitem"
-                      href="#"
-                      tabindex="-1"
-                      className="block px-4 py-2 text-sm text-gray-700"
-                    >
-                      Settings
-                    </a>
-                    <a
                       id="user-menu-item-2"
                       role="menuitem"
-                      href="#"
+                      // href="#"
                       tabindex="-1"
-                      className="block px-4 py-2 text-sm text-gray-700"
+                      onClick={logout}
+                      className="cursor-pointer hover:bg-gray-200 block px-4 py-2 text-sm text-gray-700"
                     >
-                      Sign out
+                      Log out
                     </a>
                   </div>
                 )}
@@ -200,31 +196,20 @@ function Navbar() {
         <div id="mobile-menu" className="sm:hidden">
           <div className="space-y-1 px-2 pt-2 pb-3">
             {/* <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" --> */}
-            <a
-              href="#"
-              aria-current="page"
-              className="block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white"
-            >
-              Dashboard
-            </a>
-            <a
-              href="#"
-              className="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-            >
-              Team
-            </a>
-            <a
-              href="#"
-              className="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-            >
-              Projects
-            </a>
-            <a
-              href="#"
-              className="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-            >
-              Calendar
-            </a>
+
+                  {
+                    navOptions.map((nav)=> (
+                    <a
+                    // href="#"
+                    key={nav.name}
+                    aria-current="page"
+                    className={`cursor-pointer block rounded-md px-3 py-2 text-base font-medium  ${selectedOption === nav.name ? "bg-blue-900 text-white hover:bg-gray-800" : "text-black hover:bg-gray-200"}`}
+                    onClick={()=> handleSelectedOption(nav.name)}
+                  >
+                    {nav.name}
+                  </a>
+                    ))
+                  }
           </div>
         </div>
       </nav>

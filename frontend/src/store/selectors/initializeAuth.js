@@ -1,5 +1,4 @@
 import { selector } from "recoil";
-import { authState } from "../atoms/authAtom";
 
 export const initializeAuth = selector({
   key: "initializeAuth",
@@ -31,7 +30,7 @@ export const initializeAuth = selector({
         }
 
     } catch (error) {
-        localStorage.removeItem("token");
+        // localStorage.removeItem("token");
         return {
             isAuthenticated : false,
             user : null,

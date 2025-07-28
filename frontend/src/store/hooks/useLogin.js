@@ -43,5 +43,15 @@ export function useLogin() {
     }
   }
 
-  return login;
+  function logout() {
+      localStorage.removeItem("token");
+      setAuth({
+        isAuthenticated: false,
+        user: null,
+        loading: false,
+      });
+      return { success: true };
+  }
+
+  return {login, logout};
 }
